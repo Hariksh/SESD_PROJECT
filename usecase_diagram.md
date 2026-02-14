@@ -14,8 +14,8 @@ subgraph "Inventory & Order Management System"
     UC7(Atomic Stock Check)
 
     %% Relationships
-    UC4 -.->|&lt;&lt;include&gt;&gt;| UC7
-    UC5 -.->|&lt;&lt;extend&gt;&gt;| UC6
+    UC4 -.->|&quot;&lt;&lt;include&gt;&gt;&quot;| UC7
+    UC5 -.->|&quot;&lt;&lt;extend&gt;&gt;&quot;| UC6
 end
 
 %% Actors
@@ -33,7 +33,7 @@ Staff --> UC4
 Staff --> UC5
 Staff --> UC6
 
-System --> UC6 : Auto-expire pending
+System -->|Auto-expire pending| UC6
 
 %% Flow Summary
 %% 1. **Role-Based Access**: The diagram clearly distinguishes between `Admin` (Inventory Management) and `Staff` (Order Processing) roles.
