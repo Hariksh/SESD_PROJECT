@@ -14,8 +14,8 @@ subgraph "Inventory & Order Management System"
     UC7(Atomic Stock Check)
 
     %% Relationships
-    UC4 -.-> UC7 : <<include>>
-    UC5 -.-> UC6 : <<extend>>
+    UC4 -.->|&lt;&lt;include&gt;&gt;| UC7
+    UC5 -.->|&lt;&lt;extend&gt;&gt;| UC6
 end
 
 %% Actors
