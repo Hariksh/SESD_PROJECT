@@ -35,9 +35,13 @@ Staff --> UC6
 
 System -->|Auto-expire pending| UC6
 
-%% Flow Summary
-%% 1. **Role-Based Access**: The diagram clearly distinguishes between `Admin` (Inventory Management) and `Staff` (Order Processing) roles.
-%% 2. **Authentication First**: Both actors must `Authenticate` (UC1) to access the system, ensuring secure access.
-%% 3. **Process Inclusion**: "Place Order" (UC4) *includes* "Atomic Stock Check" (UC7), highlighting that stock verification is an integral, mandatory part of the ordering process.
-%% 4. **Lifecycle Extension**: "Update Order Status" (UC5) extends "Track Order Lifecycle" (UC6), showing that status updates drive the lifecycle management of an order.
 ```
+
+### Flow Summary
+
+| Phase | Description | Key Relationships |
+| :--- | :--- | :--- |
+| **1. Role-Based Access** | Distinguishes `Admin` (Inventory) and `Staff` (Orders) capabilities. | **Actor Specialization**, **RBAC** |
+| **2. Auth First** | All actors must `Authenticate` before accessing any system features. | **Precondition**, **Security Barrier** |
+| **3. Process Inclusion** | `Place Order` mandates `Atomic Stock Check` via `<<include>>`. | **<<include>>** (Mandatory) |
+| **4. Lifecycle Extension** | `Update Order Status` adds to `Track Order Lifecycle` functionality. | **<<extend>>** (Optional/Add-on) |

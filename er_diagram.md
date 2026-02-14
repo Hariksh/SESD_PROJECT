@@ -61,9 +61,13 @@ erDiagram
     PRODUCTS ||--o{ ORDER_ITEMS : "included in"
     PRODUCTS ||--o{ STOCK_LOGS : "has history"
 
-%% Flow Summary
-%% 1. **Data Integrity**: `USERS` table stores hashed passwords (`password_hash`) for security.
-%% 2. **Concurrency Control**: `PRODUCTS` table includes a `version` column to support optimistic locking, crucial for atomic stock updates in a high-concurrency environment.
-%% 3. **Order Lifecycle**: `ORDERS` table tracks the `status` of an order, supporting lifecycle management queries.
-%% 4. **Audit Trail**: `STOCK_LOGS` entity (optional but recommended for robustness) provides a history of all stock changes for accountability.
 ```
+
+### Flow Summary
+
+| Phase | Description | Key Concepts |
+| :--- | :--- | :--- |
+| **1. Data Integrity** | `USERS` table stores `password_hash` instead of plain text. | **Hashing**, **Security Best Practices** |
+| **2. Concurrency Control** | `PRODUCTS.version` enables optimistic locking for atomic updates. | **Optimistic Locking**, **Versioning** |
+| **3. Order Lifecycle** | `ORDERS.status` tracks the progression of an order. | **State Persistence**, **Enum Mapping** |
+| **4. Audit Trail** | `STOCK_LOGS` records every stock change for accountability. | **Audit Logging**, **Event Sourcing (Lite)** |

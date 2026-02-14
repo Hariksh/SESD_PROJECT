@@ -84,9 +84,13 @@ OrderService ..> AuthService : secures
 InventoryService ..> Product : manages
 OrderService ..> Order : manages
 
-%% Flow Summary
-%% 1. **Modular Architecture**: The system is divided into distinct services (`AuthService`, `InventoryService`, `OrderService`) to decouple concerns.
-%% 2. **Secure Authentication**: `AuthService` handles user validation and token issuance, ensuring only authorized `User`s (Admin/Staff) can access specific features.
-%% 3. **Atomic Stock Updates**: `InventoryService` uses the `version` field in `Product` to perform optimistic locking, ensuring stock is updated atomically (`updateStockAtomic`) prevents race conditions.
-%% 4. **Lifecycle Management**: `Order` tracks its state via `OrderStatus` enumeration, managing the lifecycle from PENDING to DELIVERED.
 ```
+
+### Flow Summary
+
+| Phase | Description | Key Patterns |
+| :--- | :--- | :--- |
+| **1. Modular Architecture** | Services (`AuthService`, `InventoryService`, `OrderService`) are decoupled. | **Service Layer Pattern**, **Separation of Concerns** |
+| **2. Secure Authentication** | `AuthService` validates tokens; restricts access to `User` roles. | **RBAC**, **Token-Based Auth** |
+| **3. Atomic Stock Updates** | `InventoryService` ensures thread-safe stock deduction using `version`. | **Optimistic Locking**, **Atomic Operations** |
+| **4. Lifecycle Management** | `Order` state managed via `OrderStatus` (PENDING → DELIVERED). | **State Machine**, **Enum Strategy** |
