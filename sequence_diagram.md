@@ -40,4 +40,4 @@ sequenceDiagram
     %% 3. **Atomic Integrity**: `InventoryService` performs an atomic update using optimistic locking (`WHERE version = V1`). If the rows affected is 0, it means the data changed concurrently, and the transaction would roll back.
     %% 4. **Transactional Safety**: The stock deduction and order creation happen within a transaction scope to ensure data consistency.
 
-    ```
+```
