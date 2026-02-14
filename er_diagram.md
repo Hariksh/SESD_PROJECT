@@ -10,16 +10,25 @@ erDiagram
         datetime created_at
     }
 
+    CATEGORIES {
+        string _id PK
+        string name
+        string description
+    }
+
     PRODUCTS {
         string _id PK
         string name
         string description
         float price
         int stock
+        int low_stock_threshold
         int version "Optimistic Lock"
         string category_id FK
         datetime updated_at
     }
+
+    CATEGORIES ||--o{ PRODUCTS : categorizes
 
     ORDERS {
         string _id PK

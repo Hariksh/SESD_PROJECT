@@ -22,9 +22,18 @@ class Product {
     +string name
     +float price
     +int stock
+    +int lowStockThreshold
     +int version
     +isAvailable(int qty)
 }
+
+class Category {
+    +string id
+    +string name
+    +string description
+}
+
+Product "*" -- "1" Category
 
 class Order {
     +string id
