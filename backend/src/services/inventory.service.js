@@ -1,6 +1,7 @@
 const Product = require('../models/product.model');
+const BaseService = require('../core/base.service');
 
-class InventoryService {
+class InventoryService extends BaseService {
     async getAllProducts() {
         return await Product.find({});
     }
@@ -20,13 +21,11 @@ class InventoryService {
             throw new Error('Product not found');
         }
 
-        // Apply updates
         Object.assign(product, productData);
         return await product.save();
     }
 
     async updateStockAtomic(id, quantity, expectedVersion) {
-        // This implements optimistic locking
         const product = await Product.findOneAndUpdate(
             { _id: id, version: expectedVersion },
             {
@@ -37,7 +36,6 @@ class InventoryService {
         );
 
         if (!product) {
-            // Check if product exists but version mismatched
             const exists = await Product.findById(id);
             if (!exists) throw new Error('Product not found');
             throw new Error('Conflict: Product was updated by another process. Please retry.');

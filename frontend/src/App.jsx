@@ -1,32 +1,37 @@
-import React, { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Navbar from './components/Navbar';
+import './index.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('userInfo')));
+
+  const login = (userData) => {
+    localStorage.setItem('userInfo', JSON.stringify(userData));
+    setUser(userData);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('userInfo');
+    setUser(null);
+  };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button onClick={() => setCount(count => count + 1)}>count is: {count}</button>
-        </p>
-        <p>
-          Edit <code>App.jsx</code> and save to test HMR updates.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  )
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar user={user} logout={logout} />
+        <main className="container mx-auto px-4 py-8">
+          <Routes>
+            <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login login={login} />} />
+            <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/login" />} />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
+  );
 }
 
-export default App
+export default App;

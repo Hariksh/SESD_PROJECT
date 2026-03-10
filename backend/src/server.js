@@ -2,31 +2,42 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
-const { protect, admin } = require('./middleware/auth.middleware');
-
-// Route imports
 const authRoutes = require('./routes/auth.routes');
 const productRoutes = require('./routes/product.routes');
 
-dotenv.config();
-connectDB();
+class App {
+    constructor() {
+        this.app = express();
+        this.config();
+        this.setupDatabase();
+        this.routes();
+    }
 
-const app = express();
+    config() {
+        dotenv.config();
+        this.app.use(cors());
+        this.app.use(express.json());
+    }
 
-app.use(cors());
-app.use(express.json());
+    setupDatabase() {
+        connectDB();
+    }
 
-// Basic Route
-app.get('/', (req, res) => {
-    res.send('API is running...');
-});
+    routes() {
+        this.app.get('/', (req, res) => {
+            res.send('OOP API is running...');
+        });
+        this.app.use('/api/auth', authRoutes);
+        this.app.use('/api/products', productRoutes);
+    }
 
-// Hook up routes
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
+    start() {
+        const PORT = process.env.PORT || 5001;
+        this.app.listen(PORT, () => {
+            console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+        });
+    }
+}
 
-const PORT = process.env.PORT || 5001;
-
-app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-});
+const application = new App();
+application.start();

@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
+const BaseService = require('../core/base.service');
 
-class AuthService {
+class AuthService extends BaseService {
     async authenticate(email, password) {
         const user = await User.findOne({ email });
         if (user && (await user.matchPassword(password))) {
