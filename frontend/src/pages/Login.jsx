@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 
 const Login = ({ login }) => {
-    const [email, setEmail] = useState('admin@example.com');
-    const [password, setPassword] = useState('password123');
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleLogin = (role) => {
         login({
-            _id: '1',
-            name: 'Admin User',
-            email: email,
-            role: email === 'admin@example.com' ? 'ADMIN' : 'STAFF',
-            token: 'mock-token'
+            _id: role === 'ADMIN' ? '1' : '2',
+            name: role === 'ADMIN' ? 'Admin User' : 'Staff Worker',
+            email: role === 'ADMIN' ? 'admin@example.com' : 'staff@example.com',
+            role: role
         });
     };
 
@@ -29,57 +24,21 @@ const Login = ({ login }) => {
                         </svg>
                     </div>
                     <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                        Welcome Back
+                        Simulated Login
                     </h2>
                     <p className="mt-3 text-sm text-slate-500 font-medium tracking-wide">
-                        Please sign in to your dashboard
+                        Choose a role to test Simple RBAC
                     </p>
                 </div>
                 
-                <form className="space-y-6" onSubmit={handleSubmit}>
-                    <div className="space-y-5">
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2" htmlFor="email">Email</label>
-                            <input
-                                id="email"
-                                type="email"
-                                required
-                                className="glass-input"
-                                placeholder="name@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <label className="block text-sm font-semibold text-slate-700" htmlFor="password">Password</label>
-                                <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors">Forgot password?</a>
-                            </div>
-                            <input
-                                id="password"
-                                type="password"
-                                required
-                                className="glass-input"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex items-center">
-                        <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded cursor-pointer" />
-                        <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-600 cursor-pointer">
-                            Remember me for 30 days
-                        </label>
-                    </div>
-
-                    <div className="pt-2">
-                        <button type="submit" className="btn-primary">
-                            Sign in to account
-                        </button>
-                    </div>
-                </form>
+                <div className="space-y-4">
+                     <button onClick={() => handleLogin('ADMIN')} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                            Login as Admin
+                    </button>
+                    <button onClick={() => handleLogin('STAFF')} className="w-full flex justify-center py-3 px-4 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                            Login as Staff
+                    </button>
+                </div>
             </div>
         </div>
     );

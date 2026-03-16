@@ -13,6 +13,9 @@ class ProductController extends BaseController {
 
     async createProduct(req, res) {
         try {
+            if (req.body.role !== 'ADMIN') {
+                return this.sendError(res, 'Forbidden: Admin access only', 403);
+            }
             const product = await inventoryService.createProduct(req.body);
             return this.sendSuccess(res, product, 'Product created successfully', 201);
         } catch (error) {
@@ -21,8 +24,11 @@ class ProductController extends BaseController {
     }
 
     async updateStock(req, res) {
-        const { quantity, version } = req.body;
+        const { quantity, version, role } = req.body;
         try {
+            if (role !== 'STAFF' && role !== 'ADMIN') {
+                 return this.sendError(res, 'Forbidden: Staff or Admin access only', 403);
+            }
             const updatedProduct = await inventoryService.updateStockAtomic(req.params.id, quantity, version);
             return this.sendSuccess(res, updatedProduct, 'Stock updated successfully');
         } catch (error) {

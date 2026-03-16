@@ -34,12 +34,10 @@ const productSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-// Middleware to increment version on update for optimistic locking
-productSchema.pre('save', function (next) {
+productSchema.pre('save', function () {
     if (this.isModified('stock')) {
         this.version += 1;
     }
-    next();
 });
 
 const Product = mongoose.model('Product', productSchema);
