@@ -25,7 +25,6 @@ class ProductController extends BaseController {
 
     async createProduct(req, res) {
         try {
-            // RBAC enforced by middleware — req.user is guaranteed to be ADMIN
             const product = await inventoryService.createProduct(req.body);
             return this.sendSuccess(res, product, 'Product created successfully', 201);
         } catch (error) {
@@ -54,7 +53,6 @@ class ProductController extends BaseController {
     async updateStock(req, res) {
         const { quantity, version } = req.body;
         try {
-            // RBAC enforced by middleware — req.user is guaranteed to be STAFF or ADMIN
             const updatedProduct = await inventoryService.updateStockAtomic(req.params.id, quantity, version);
             return this.sendSuccess(res, updatedProduct, 'Stock updated successfully');
         } catch (error) {

@@ -42,7 +42,7 @@ class InventoryService extends BaseService {
             throw new Error('Conflict: Product was updated by another process. Please retry.');
         }
 
-        // Create audit log for the stock change
+
         await StockLog.create({
             product: product._id,
             quantityChanged: quantity,

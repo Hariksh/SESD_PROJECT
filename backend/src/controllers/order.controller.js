@@ -16,7 +16,6 @@ class OrderController extends BaseController {
 
     async getOrders(req, res) {
         try {
-            // Admin sees all orders, Staff sees only their own
             const userId = req.user.role === 'ADMIN' ? null : req.user._id;
             const orders = await orderService.getOrders(userId);
             return this.sendSuccess(res, orders);
@@ -29,7 +28,6 @@ class OrderController extends BaseController {
         try {
             const order = await orderService.getOrderById(req.params.id);
 
-            // Staff can only view their own orders
             if (req.user.role !== 'ADMIN' && order.user._id.toString() !== req.user._id.toString()) {
                 return this.sendError(res, 'Not authorized to view this order', 403);
             }

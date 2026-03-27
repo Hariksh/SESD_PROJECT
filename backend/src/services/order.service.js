@@ -4,13 +4,6 @@ const StockLog = require('../models/stockLog.model');
 const BaseService = require('../core/base.service');
 
 class OrderService extends BaseService {
-    /**
-     * Place a new order:
-     * 1. Validate all products exist and have sufficient stock
-     * 2. Deduct stock atomically using optimistic locking
-     * 3. Create StockLog entries for each deduction
-     * 4. Create the order with calculated total
-     */
     async placeOrder(userId, items) {
         if (!items || items.length === 0) {
             throw new Error('Order must have at least one item');
@@ -19,7 +12,6 @@ class OrderService extends BaseService {
         const orderItems = [];
         const stockLogs = [];
 
-        // Process each item — validate stock and deduct atomically
         for (const item of items) {
             const product = await Product.findById(item.productId);
             if (!product) {
@@ -32,7 +24,6 @@ class OrderService extends BaseService {
                 );
             }
 
-            // Atomic stock deduction with optimistic locking
             const updated = await Product.findOneAndUpdate(
                 { _id: product._id, version: product.version },
                 {
@@ -54,7 +45,6 @@ class OrderService extends BaseService {
                 unitPrice: product.price,
             });
 
-            // Prepare StockLog entry
             stockLogs.push({
                 product: product._id,
                 quantityChanged: -item.quantity,
@@ -62,7 +52,6 @@ class OrderService extends BaseService {
             });
         }
 
-        // Create the order
         const order = new Order({
             user: userId,
             items: orderItems,
@@ -70,7 +59,6 @@ class OrderService extends BaseService {
         order.calculateTotal();
         await order.save();
 
-        // Create StockLog entries with order reference
         for (const log of stockLogs) {
             log.order = order._id;
             await StockLog.create(log);
@@ -79,9 +67,6 @@ class OrderService extends BaseService {
         return order;
     }
 
-    /**
-     * Get all orders, optionally filtered by user
-     */
     async getOrders(userId = null) {
         const filter = userId ? { user: userId } : {};
         return await Order.find(filter)
@@ -90,9 +75,6 @@ class OrderService extends BaseService {
             .sort({ createdAt: -1 });
     }
 
-    /**
-     * Get a single order by ID
-     */
     async getOrderById(orderId) {
         const order = await Order.findById(orderId)
             .populate('user', 'name email role')
@@ -104,15 +86,6 @@ class OrderService extends BaseService {
         return order;
     }
 
-    /**
-     * Update order status with state machine validation
-     * Valid transitions defined in OrderSchema.VALID_TRANSITIONS:
-     *   PENDING → CONFIRMED | CANCELLED
-     *   CONFIRMED → SHIPPED | CANCELLED
-     *   SHIPPED → DELIVERED
-     *   DELIVERED → (none)
-     *   CANCELLED → (none)
-     */
     async updateOrderStatus(orderId, newStatus) {
         const order = await Order.findById(orderId);
         if (!order) {
@@ -126,7 +99,6 @@ class OrderService extends BaseService {
             );
         }
 
-        // If cancelling, restock the products
         if (newStatus === 'CANCELLED') {
             for (const item of order.items) {
                 await Product.findByIdAndUpdate(item.product, {

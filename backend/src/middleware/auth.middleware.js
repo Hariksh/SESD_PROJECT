@@ -34,7 +34,7 @@ const admin = (req, res, next) => {
     }
 };
 
-// Flexible role-based middleware: authorize('ADMIN', 'STAFF')
+
 const authorize = (...roles) => {
     return (req, res, next) => {
         if (req.user && roles.includes(req.user.role)) {
