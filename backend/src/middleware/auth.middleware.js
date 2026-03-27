@@ -14,15 +14,15 @@ const protect = async (req, res, next) => {
                 return res.status(401).json({ message: 'Not authorized, user not found' });
             }
             req.user = user;
-            next();
+            return next();
         } catch (error) {
             console.error(error);
-            res.status(401).json({ message: 'Not authorized, token failed' });
+            return res.status(401).json({ message: 'Not authorized, token failed' });
         }
     }
 
     if (!token) {
-        res.status(401).json({ message: 'Not authorized, no token' });
+        return res.status(401).json({ message: 'Not authorized, no token' });
     }
 };
 
@@ -34,4 +34,17 @@ const admin = (req, res, next) => {
     }
 };
 
-module.exports = { protect, admin };
+// Flexible role-based middleware: authorize('ADMIN', 'STAFF')
+const authorize = (...roles) => {
+    return (req, res, next) => {
+        if (req.user && roles.includes(req.user.role)) {
+            next();
+        } else {
+            res.status(403).json({
+                message: `Not authorized. Required role: ${roles.join(' or ')}`,
+            });
+        }
+    };
+};
+
+module.exports = { protect, admin, authorize };

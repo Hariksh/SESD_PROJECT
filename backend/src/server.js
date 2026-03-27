@@ -4,6 +4,8 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth.routes');
 const productRoutes = require('./routes/product.routes');
+const categoryRoutes = require('./routes/category.routes');
+const orderRoutes = require('./routes/order.routes');
 
 class App {
     constructor() {
@@ -29,6 +31,8 @@ class App {
         });
         this.app.use('/api/auth', authRoutes);
         this.app.use('/api/products', productRoutes);
+        this.app.use('/api/categories', categoryRoutes);
+        this.app.use('/api/orders', orderRoutes);
     }
 
     start() {

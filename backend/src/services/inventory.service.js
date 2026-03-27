@@ -1,13 +1,14 @@
 const Product = require('../models/product.model');
+const StockLog = require('../models/stockLog.model');
 const BaseService = require('../core/base.service');
 
 class InventoryService extends BaseService {
     async getAllProducts() {
-        return await Product.find({});
+        return await Product.find({}).populate('category', 'name');
     }
 
     async getProductById(id) {
-        return await Product.findById(id);
+        return await Product.findById(id).populate('category', 'name');
     }
 
     async createProduct(productData) {
@@ -41,6 +42,13 @@ class InventoryService extends BaseService {
             throw new Error('Conflict: Product was updated by another process. Please retry.');
         }
 
+        // Create audit log for the stock change
+        await StockLog.create({
+            product: product._id,
+            quantityChanged: quantity,
+            changeType: quantity > 0 ? 'RESTOCK' : 'DEDUCT',
+        });
+
         return product;
     }
 
@@ -51,6 +59,12 @@ class InventoryService extends BaseService {
             return true;
         }
         throw new Error('Product not found');
+    }
+
+    async getStockLogs(productId) {
+        return await StockLog.find({ product: productId })
+            .populate('order', 'status totalAmount')
+            .sort({ createdAt: -1 });
     }
 }
 
