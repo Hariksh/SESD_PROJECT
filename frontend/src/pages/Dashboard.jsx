@@ -1,12 +1,52 @@
 import React, { useState, useEffect } from 'react';
+import { 
+    ResponsiveContainer, PieChart, Pie, Cell, 
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
+    BarChart, Bar, Legend
+} from 'recharts';
 
 const Dashboard = ({ user }) => {
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [analyticsData, setAnalyticsData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    const fetchAnalytics = async () => {
+        if (user.role !== 'ADMIN') return;
+        try {
+            const response = await fetch('http://localhost:5002/api/analytics/dashboard', {
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setAnalyticsData(data.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch analytics', error);
+        }
+    };
+
+    const fetchCategories = async () => {
+        try {
+            const response = await fetch('http://localhost:5002/api/categories', {
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setCategories(data.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch categories', error);
+        }
+    };
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('http://localhost:5001/api/products');
+            const response = await fetch('http://localhost:5002/api/products', {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                }
+            });
             const data = await response.json();
             if (data.success) {
                 setProducts(data.data);
@@ -20,13 +60,18 @@ const Dashboard = ({ user }) => {
 
     useEffect(() => {
         fetchProducts();
+        fetchCategories();
+        fetchAnalytics();
     }, []);
 
     const updateStock = async (id, newQuantity, version) => {
         try {
-            const response = await fetch(`http://localhost:5001/api/products/${id}/stock`, {
+            const response = await fetch(`http://localhost:5002/api/products/${id}/stock`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
+                },
                 body: JSON.stringify({ quantity: newQuantity, version, role: user.role })
             });
             const data = await response.json();
@@ -46,9 +91,12 @@ const Dashboard = ({ user }) => {
         e.preventDefault();
         
         try {
-            const response = await fetch('http://localhost:5001/api/products', {
+            const response = await fetch('http://localhost:5002/api/products', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
+                },
                 body: JSON.stringify({
                     name: newProduct.name,
                     price: parseFloat(newProduct.price),
@@ -114,6 +162,61 @@ const Dashboard = ({ user }) => {
                 </div>
             </div>
 
+            {/* Analytics Section */}
+            {user.role === 'ADMIN' && analyticsData && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up delay-150">
+                    <div className="glass-card p-6 min-h-[350px]">
+                        <h3 className="text-lg font-bold text-slate-800 mb-6">Revenue Trends (Last 7 Days)</h3>
+                        <div className="h-64 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={analyticsData.revenueTrends}>
+                                    <defs>
+                                        <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
+                                    <Tooltip 
+                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    />
+                                    <Area type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    <div className="glass-card p-6 min-h-[350px]">
+                        <h3 className="text-lg font-bold text-slate-800 mb-6">Category Distribution</h3>
+                        <div className="h-64 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={analyticsData.categoryDistribution}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        {analyticsData.categoryDistribution.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={['#3b82f6', '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b'][index % 6]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip 
+                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    />
+                                    <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="glass-card overflow-hidden animate-slide-up delay-200">
                 <div className="px-6 py-5 border-b border-slate-100 bg-white/50 flex justify-between items-center">
                     <h2 className="text-lg font-bold text-slate-800">Product List</h2>
@@ -151,7 +254,7 @@ const Dashboard = ({ user }) => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
                                         <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-semibold">
-                                            {product.category}
+                                            {product.category?.name || 'Unknown'}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -220,11 +323,9 @@ const Dashboard = ({ user }) => {
                                 <label className="block text-sm font-semibold text-slate-700 mb-1">Category</label>
                                 <select required value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-slate-700">
                                     <option value="" disabled>Select a category</option>
-                                    <option value="Electronics">Electronics</option>
-                                    <option value="Furniture">Furniture</option>
-                                    <option value="Kitchen">Kitchen</option>
-                                    <option value="Office">Office</option>
-                                    <option value="Generic">Generic</option>
+                                    {categories.map(cat => (
+                                        <option key={cat._id} value={cat._id}>{cat.name}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="pt-4 flex justify-end gap-3">

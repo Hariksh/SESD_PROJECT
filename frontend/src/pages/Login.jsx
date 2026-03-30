@@ -1,13 +1,45 @@
 import React, { useState } from 'react';
 
 const Login = ({ login }) => {
-    const handleLogin = (role) => {
-        login({
-            _id: role === 'ADMIN' ? '1' : '2',
+    const handleLogin = async (role) => {
+        const payload = {
             name: role === 'ADMIN' ? 'Admin User' : 'Staff Worker',
             email: role === 'ADMIN' ? 'admin@example.com' : 'staff@example.com',
+            password: 'password123',
             role: role
-        });
+        };
+
+        try {
+            // First try to register (if DB is empty or user not created yet)
+            let res = await fetch('http://localhost:5002/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            let data = await res.json();
+
+            if (data.success) {
+                login(data.data);
+            } else if (data.message === 'User already exists') {
+                // If the user already exists in DB, just login
+                res = await fetch('http://localhost:5002/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: payload.email, password: payload.password })
+                });
+                data = await res.json();
+                if (data.success) {
+                    login(data.data);
+                } else {
+                    alert('Login failed: ' + data.message);
+                }
+            } else {
+                alert('Connection failed: ' + data.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Failed to connect to backend.');
+        }
     };
 
     return (

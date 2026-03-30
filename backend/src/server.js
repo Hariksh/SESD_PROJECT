@@ -33,6 +33,7 @@ class App {
         this.app.use('/api/products', productRoutes);
         this.app.use('/api/categories', categoryRoutes);
         this.app.use('/api/orders', orderRoutes);
+        this.app.use('/api/analytics', require('./routes/analytics.routes'));
     }
 
     start() {
