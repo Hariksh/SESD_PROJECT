@@ -4,6 +4,9 @@ const StockLog = require('../models/stockLog.model');
 const BaseService = require('../core/base.service');
 
 class OrderService extends BaseService {
+    constructor() {
+        super(Order);
+    }
     async placeOrder(userId, items) {
         if (!items || items.length === 0) {
             throw new Error('Order must have at least one item');

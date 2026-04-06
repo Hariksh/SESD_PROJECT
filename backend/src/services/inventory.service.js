@@ -3,31 +3,20 @@ const StockLog = require('../models/stockLog.model');
 const BaseService = require('../core/base.service');
 
 class InventoryService extends BaseService {
-    async getAllProducts() {
-        return await Product.find({}).populate('category', 'name');
+    constructor() {
+        super(Product);
     }
 
-    async getProductById(id) {
-        return await Product.findById(id).populate('category', 'name');
+    async getAll() {
+        return await this.model.find({}).populate('category', 'name');
     }
 
-    async createProduct(productData) {
-        const product = new Product(productData);
-        return await product.save();
-    }
-
-    async updateProduct(id, productData) {
-        const product = await Product.findById(id);
-        if (!product) {
-            throw new Error('Product not found');
-        }
-
-        Object.assign(product, productData);
-        return await product.save();
+    async getById(id) {
+        return await this.model.findById(id).populate('category', 'name');
     }
 
     async updateStockAtomic(id, quantity, expectedVersion) {
-        const product = await Product.findOneAndUpdate(
+        const product = await this.model.findOneAndUpdate(
             { _id: id, version: expectedVersion },
             {
                 $inc: { stock: quantity },
@@ -37,7 +26,7 @@ class InventoryService extends BaseService {
         );
 
         if (!product) {
-            const exists = await Product.findById(id);
+            const exists = await this.model.findById(id);
             if (!exists) throw new Error('Product not found');
             throw new Error('Conflict: Product was updated by another process. Please retry.');
         }
@@ -50,15 +39,6 @@ class InventoryService extends BaseService {
         });
 
         return product;
-    }
-
-    async deleteProduct(id) {
-        const product = await Product.findById(id);
-        if (product) {
-            await product.deleteOne();
-            return true;
-        }
-        throw new Error('Product not found');
     }
 
     async getStockLogs(productId) {

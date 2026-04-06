@@ -4,7 +4,7 @@ const inventoryService = require('../services/inventory.service');
 class ProductController extends BaseController {
     async getAllProducts(req, res) {
         try {
-            const products = await inventoryService.getAllProducts();
+            const products = await inventoryService.getAll();
             return this.sendSuccess(res, products);
         } catch (error) {
             return this.sendError(res, error.message);
@@ -13,7 +13,7 @@ class ProductController extends BaseController {
 
     async getProductById(req, res) {
         try {
-            const product = await inventoryService.getProductById(req.params.id);
+            const product = await inventoryService.getById(req.params.id);
             if (!product) {
                 return this.sendError(res, 'Product not found', 404);
             }
@@ -25,7 +25,7 @@ class ProductController extends BaseController {
 
     async createProduct(req, res) {
         try {
-            const product = await inventoryService.createProduct(req.body);
+            const product = await inventoryService.create(req.body);
             return this.sendSuccess(res, product, 'Product created successfully', 201);
         } catch (error) {
             return this.sendError(res, error.message, 400);
@@ -34,7 +34,7 @@ class ProductController extends BaseController {
 
     async updateProduct(req, res) {
         try {
-            const product = await inventoryService.updateProduct(req.params.id, req.body);
+            const product = await inventoryService.update(req.params.id, req.body);
             return this.sendSuccess(res, product, 'Product updated successfully');
         } catch (error) {
             return this.sendError(res, error.message, 400);
@@ -43,7 +43,7 @@ class ProductController extends BaseController {
 
     async deleteProduct(req, res) {
         try {
-            await inventoryService.deleteProduct(req.params.id);
+            await inventoryService.delete(req.params.id);
             return this.sendSuccess(res, null, 'Product deleted successfully');
         } catch (error) {
             return this.sendError(res, error.message, 400);
