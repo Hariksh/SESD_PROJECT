@@ -87,6 +87,34 @@ const Dashboard = ({ user }) => {
     const [isAddFormOpen, setIsAddFormOpen] = useState(false);
     const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '', category: '' });
 
+    // Category Modal State
+    const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+
+    const handleAddCategorySubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch('http://localhost:5002/api/categories', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
+                },
+                body: JSON.stringify({ name: newCategoryName, description: 'Added via Dashboard UI' })
+            });
+            const data = await response.json();
+            if (data.success) {
+                setIsCategoryFormOpen(false);
+                setNewCategoryName('');
+                fetchCategories();
+            } else {
+                alert(data.message || 'Failed to add category');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const handleAddProductSubmit = async (e) => {
         e.preventDefault();
         
@@ -131,9 +159,14 @@ const Dashboard = ({ user }) => {
                 <div className="flex gap-3">
                     <button className="btn-secondary" onClick={fetchProducts}>Refresh Data</button>
                     {user.role === 'ADMIN' && (
-                        <button onClick={() => setIsAddFormOpen(true)} className="btn-primary shadow-blue-500/20 px-5 py-2">
-                            + Add Product
-                        </button>
+                        <>
+                            <button onClick={() => setIsCategoryFormOpen(true)} className="btn-secondary px-5 py-2 shadow-sm font-bold bg-white text-slate-700 hover:text-blue-600 hover:bg-slate-50 transition-all border border-slate-200 rounded-xl">
+                                + Add Category
+                            </button>
+                            <button onClick={() => setIsAddFormOpen(true)} className="btn-primary shadow-blue-500/20 px-5 py-2">
+                                + Add Product
+                            </button>
+                        </>
                     )}
                 </div>
             </header>
@@ -336,6 +369,31 @@ const Dashboard = ({ user }) => {
                     </div>
                 </div>
             )}
+
+            {/* Category Modal */}
+            {isCategoryFormOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl shadow-blue-900/20 w-full max-w-sm overflow-hidden relative">
+                        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 className="text-lg font-bold text-slate-800">Add New Category</h3>
+                            <button onClick={() => setIsCategoryFormOpen(false)} className="text-slate-400 hover:text-rose-500 transition-colors">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        <form onSubmit={handleAddCategorySubmit} className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-1">Category Name</label>
+                                <input type="text" required value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all" placeholder="e.g. Electronics, Furniture" />
+                            </div>
+                            <div className="pt-4 flex justify-end gap-3">
+                                <button type="button" onClick={() => setIsCategoryFormOpen(false)} className="px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg shadow-sm font-medium transition-colors">Cancel</button>
+                                <button type="submit" className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-500/30 font-medium transition-colors">Save Category</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };

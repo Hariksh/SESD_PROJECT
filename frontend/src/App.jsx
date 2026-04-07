@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Orders from './pages/Orders';
 import Navbar from './components/Navbar';
 import './index.css';
 
@@ -26,6 +27,7 @@ function App() {
           <Routes>
             <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login login={login} />} />
             <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/login" />} />
+            <Route path="/orders" element={user ? <Orders user={user} /> : <Navigate to="/login" />} />
             <Route path="/" element={<Navigate to="/dashboard" />} />
           </Routes>
         </main>

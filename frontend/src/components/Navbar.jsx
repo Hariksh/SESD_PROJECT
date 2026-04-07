@@ -12,6 +12,10 @@ const Navbar = ({ user, logout }) => {
                 <div className="flex items-center space-x-6">
                     {user ? (
                         <>
+                            <div className="flex gap-6 mr-4 text-sm font-semibold text-slate-700 items-center border-r border-slate-200 pr-6">
+                                <Link to="/dashboard" className="hover:text-blue-600 transition-colors">Dashboard</Link>
+                                <Link to="/orders" className="hover:text-blue-600 transition-colors">Orders</Link>
+                            </div>
                             <div className="flex flex-col text-right">
                                 <span className="text-slate-800 font-semibold leading-tight">{user.name}</span>
                                 <span className="text-slate-500 text-xs font-medium uppercase tracking-wide">{user.role}</span>
