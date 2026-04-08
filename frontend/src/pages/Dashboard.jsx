@@ -91,6 +91,27 @@ const Dashboard = ({ user }) => {
     const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState('');
 
+    // Logs Modal State
+    const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
+    const [selectedProductLogs, setSelectedProductLogs] = useState([]);
+    const [selectedProductName, setSelectedProductName] = useState('');
+    
+    const fetchStockLogs = async (productId, productName) => {
+        try {
+            const response = await fetch(`http://localhost:5002/api/products/${productId}/logs`, {
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setSelectedProductLogs(data.data);
+                setSelectedProductName(productName);
+                setIsLogsModalOpen(true);
+            }
+        } catch (error) {
+            console.error('Failed to fetch stock logs', error);
+        }
+    };
+
     const handleAddCategorySubmit = async (e) => {
         e.preventDefault();
         try {
@@ -308,6 +329,13 @@ const Dashboard = ({ user }) => {
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div className="flex justify-end gap-2 pr-2">
                                             <button 
+                                                onClick={() => fetchStockLogs(product._id, product.name)}
+                                                className="px-3 py-1 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-md text-xs font-bold transition-colors"
+                                                title="View Logs"
+                                            >
+                                                Logs
+                                            </button>
+                                            <button 
                                                 onClick={() => updateStock(product._id, 1, product.version)}
                                                 className="w-8 h-8 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center font-bold transition-colors"
                                             >
@@ -390,6 +418,44 @@ const Dashboard = ({ user }) => {
                                 <button type="submit" className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-500/30 font-medium transition-colors">Save Category</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Stock Logs Modal */}
+            {isLogsModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl shadow-blue-900/20 w-full max-w-2xl max-h-[80vh] flex flex-col relative overflow-hidden">
+                        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 className="text-lg font-bold text-slate-800">Stock History: {selectedProductName}</h3>
+                            <button onClick={() => setIsLogsModalOpen(false)} className="text-slate-400 hover:text-rose-500 transition-colors">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        <div className="p-6 flex-1 overflow-y-auto bg-slate-50">
+                            {selectedProductLogs.length === 0 ? (
+                                <p className="text-center text-slate-500 py-8 font-medium">No stock history available.</p>
+                            ) : (
+                                <div className="space-y-3">
+                                    {selectedProductLogs.map(log => (
+                                        <div key={log._id} className="flex justify-between items-center p-4 border border-slate-200 rounded-xl bg-white shadow-sm">
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-800 flex items-center">
+                                                    {log.changeType === 'RESTOCK' ? 'Manual Restock / Cancelled Order' : 'Order Placed / Deduction'} 
+                                                    <span className={`ml-3 px-2 py-0.5 rounded-full text-xs font-bold ${log.changeType === 'RESTOCK' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                                                        {log.changeType === 'RESTOCK' ? '+' : ''}{log.quantityChanged}
+                                                    </span>
+                                                </p>
+                                                <p className="text-xs font-medium text-slate-500 mt-2">{new Date(log.createdAt).toLocaleString()}</p>
+                                                {log.order && (
+                                                    <div className="text-xs text-indigo-600 mt-1 font-semibold">Associated Order Status: {log.order.status}</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
