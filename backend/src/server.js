@@ -40,8 +40,6 @@ class App {
         const PORT = process.env.PORT || 5001;
         this.app.listen(PORT, () => {
             console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-            
-            // Initialize Cron Jobs
             const OrderCronJob = require('./jobs/orderCron');
             OrderCronJob.init();
         });

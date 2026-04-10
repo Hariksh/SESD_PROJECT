@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    ResponsiveContainer, PieChart, Pie, Cell, 
-    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
+import {
+    ResponsiveContainer, PieChart, Pie, Cell,
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
     BarChart, Bar, Legend
 } from 'recharts';
 
@@ -68,7 +68,7 @@ const Dashboard = ({ user }) => {
         try {
             const response = await fetch(`http://localhost:5002/api/products/${id}/stock`, {
                 method: 'PATCH',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${user.token}`
                 },
@@ -84,18 +84,36 @@ const Dashboard = ({ user }) => {
             console.error(error);
         }
     };
+
+    const deleteProduct = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this product?')) {
+            return;
+        }
+        try {
+            const response = await fetch(`http://localhost:5002/api/products/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                fetchProducts();
+            } else {
+                alert(data.message || 'Failed to delete product');
+            }
+        } catch (error) {
+            console.error('Failed to delete product', error);
+        }
+    };
     const [isAddFormOpen, setIsAddFormOpen] = useState(false);
     const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '', category: '' });
-
-    // Category Modal State
     const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState('');
-
-    // Logs Modal State
     const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
     const [selectedProductLogs, setSelectedProductLogs] = useState([]);
     const [selectedProductName, setSelectedProductName] = useState('');
-    
+
     const fetchStockLogs = async (productId, productName) => {
         try {
             const response = await fetch(`http://localhost:5002/api/products/${productId}/logs`, {
@@ -117,7 +135,7 @@ const Dashboard = ({ user }) => {
         try {
             const response = await fetch('http://localhost:5002/api/categories', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${user.token}`
                 },
@@ -138,11 +156,11 @@ const Dashboard = ({ user }) => {
 
     const handleAddProductSubmit = async (e) => {
         e.preventDefault();
-        
+
         try {
             const response = await fetch('http://localhost:5002/api/products', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${user.token}`
                 },
@@ -226,14 +244,14 @@ const Dashboard = ({ user }) => {
                                 <AreaChart data={analyticsData.revenueTrends}>
                                     <defs>
                                         <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} dy={10} />
-                                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} />
-                                    <Tooltip 
+                                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                                    <Tooltip
                                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                                     />
                                     <Area type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
@@ -260,7 +278,7 @@ const Dashboard = ({ user }) => {
                                             <Cell key={`cell-${index}`} fill={['#3b82f6', '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b'][index % 6]} />
                                         ))}
                                     </Pie>
-                                    <Tooltip 
+                                    <Tooltip
                                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                                     />
                                     <Legend verticalAlign="bottom" height={36} iconType="circle" />
@@ -312,14 +330,12 @@ const Dashboard = ({ user }) => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                                            product.stock === 0 ? 'bg-rose-100 text-rose-700' :
+                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${product.stock === 0 ? 'bg-rose-100 text-rose-700' :
                                             product.stock < 10 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'
-                                        }`}>
-                                            <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                                                product.stock === 0 ? 'bg-rose-500' :
+                                            }`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${product.stock === 0 ? 'bg-rose-500' :
                                                 product.stock < 10 ? 'bg-amber-500' : 'bg-emerald-500'
-                                            }`}></span>
+                                                }`}></span>
                                             {product.stock} in stock
                                         </span>
                                     </td>
@@ -328,26 +344,35 @@ const Dashboard = ({ user }) => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div className="flex justify-end gap-2 pr-2">
-                                            <button 
+                                            <button
                                                 onClick={() => fetchStockLogs(product._id, product.name)}
                                                 className="px-3 py-1 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-md text-xs font-bold transition-colors"
                                                 title="View Logs"
                                             >
                                                 Logs
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => updateStock(product._id, 1, product.version)}
                                                 className="w-8 h-8 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center font-bold transition-colors"
                                             >
                                                 +
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => updateStock(product._id, -1, product.version)}
                                                 className="w-8 h-8 rounded-md bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center font-bold transition-colors"
                                                 disabled={product.stock === 0}
                                             >
                                                 -
                                             </button>
+                                            {user.role === 'ADMIN' && (
+                                                <button
+                                                    onClick={() => deleteProduct(product._id)}
+                                                    className="w-8 h-8 rounded-md bg-slate-50 text-slate-400 hover:bg-red-100 hover:text-red-600 flex items-center justify-center font-bold transition-colors"
+                                                    title="Delete Product"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
@@ -368,21 +393,21 @@ const Dashboard = ({ user }) => {
                         <form onSubmit={handleAddProductSubmit} className="p-6 space-y-4">
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-1">Product Name</label>
-                                <input type="text" required value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all" placeholder="e.g. Wireless Mouse" />
+                                <input type="text" required value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all" placeholder="e.g. Wireless Mouse" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-700 mb-1">Price ($)</label>
-                                    <input type="number" step="0.01" required value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all" placeholder="29.99" />
+                                    <input type="number" step="0.01" required value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all" placeholder="29.99" />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-700 mb-1">Initial Stock</label>
-                                    <input type="number" required value={newProduct.stock} onChange={e => setNewProduct({...newProduct, stock: e.target.value})} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all" placeholder="100" />
+                                    <input type="number" required value={newProduct.stock} onChange={e => setNewProduct({ ...newProduct, stock: e.target.value })} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all" placeholder="100" />
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-1">Category</label>
-                                <select required value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-slate-700">
+                                <select required value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-slate-700">
                                     <option value="" disabled>Select a category</option>
                                     {categories.map(cat => (
                                         <option key={cat._id} value={cat._id}>{cat.name}</option>
@@ -421,8 +446,6 @@ const Dashboard = ({ user }) => {
                     </div>
                 </div>
             )}
-
-            {/* Stock Logs Modal */}
             {isLogsModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white rounded-2xl shadow-2xl shadow-blue-900/20 w-full max-w-2xl max-h-[80vh] flex flex-col relative overflow-hidden">
@@ -441,7 +464,7 @@ const Dashboard = ({ user }) => {
                                         <div key={log._id} className="flex justify-between items-center p-4 border border-slate-200 rounded-xl bg-white shadow-sm">
                                             <div>
                                                 <p className="text-sm font-bold text-slate-800 flex items-center">
-                                                    {log.changeType === 'RESTOCK' ? 'Manual Restock / Cancelled Order' : 'Order Placed / Deduction'} 
+                                                    {log.changeType === 'RESTOCK' ? 'Manual Restock / Cancelled Order' : 'Order Placed / Deduction'}
                                                     <span className={`ml-3 px-2 py-0.5 rounded-full text-xs font-bold ${log.changeType === 'RESTOCK' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
                                                         {log.changeType === 'RESTOCK' ? '+' : ''}{log.quantityChanged}
                                                     </span>
