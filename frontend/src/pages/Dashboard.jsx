@@ -14,7 +14,7 @@ const Dashboard = ({ user }) => {
     const fetchAnalytics = async () => {
         if (user.role !== 'ADMIN') return;
         try {
-            const response = await fetch('http://localhost:5002/api/analytics/dashboard', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/analytics/dashboard`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -28,7 +28,7 @@ const Dashboard = ({ user }) => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('http://localhost:5002/api/categories', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/categories`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -42,7 +42,7 @@ const Dashboard = ({ user }) => {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('http://localhost:5002/api/products', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`
                 }
@@ -66,7 +66,7 @@ const Dashboard = ({ user }) => {
 
     const updateStock = async (id, newQuantity, version) => {
         try {
-            const response = await fetch(`http://localhost:5002/api/products/${id}/stock`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}/stock`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ const Dashboard = ({ user }) => {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:5002/api/products/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${user.token}`
@@ -116,7 +116,7 @@ const Dashboard = ({ user }) => {
 
     const fetchStockLogs = async (productId, productName) => {
         try {
-            const response = await fetch(`http://localhost:5002/api/products/${productId}/logs`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${productId}/logs`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -133,7 +133,7 @@ const Dashboard = ({ user }) => {
     const handleAddCategorySubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5002/api/categories', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/categories`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ const Dashboard = ({ user }) => {
         e.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:5002/api/products', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -14,7 +14,7 @@ const Orders = ({ user }) => {
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch('http://localhost:5002/api/orders', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -30,7 +30,7 @@ const Orders = ({ user }) => {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('http://localhost:5002/api/products', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
             const data = await response.json();
@@ -56,7 +56,7 @@ const Orders = ({ user }) => {
 
     const updateOrderStatus = async (orderId, newStatus) => {
         try {
-            const response = await fetch(`http://localhost:5002/api/orders/${orderId}/status`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/${orderId}/status`, {
                 method: 'PATCH',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ const Orders = ({ user }) => {
         }));
 
         try {
-            const response = await fetch('http://localhost:5002/api/orders', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',

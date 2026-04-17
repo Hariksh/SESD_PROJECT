@@ -11,7 +11,7 @@ const Login = ({ login }) => {
 
         try {
             // First try to register (if DB is empty or user not created yet)
-            let res = await fetch('http://localhost:5002/api/auth/register', {
+            let res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -22,7 +22,7 @@ const Login = ({ login }) => {
                 login(data.data);
             } else if (data.message === 'User already exists') {
                 // If the user already exists in DB, just login
-                res = await fetch('http://localhost:5002/api/auth/login', {
+                res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: payload.email, password: payload.password })
