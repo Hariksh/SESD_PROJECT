@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth.routes');
 const productRoutes = require('./routes/product.routes');
 const categoryRoutes = require('./routes/category.routes');
 const orderRoutes = require('./routes/order.routes');
+const userRoutes = require('./routes/user.routes');
 
 class App {
     constructor() {
@@ -33,6 +34,7 @@ class App {
         this.app.use('/api/products', productRoutes);
         this.app.use('/api/categories', categoryRoutes);
         this.app.use('/api/orders', orderRoutes);
+        this.app.use('/api/users', userRoutes);
         this.app.use('/api/analytics', require('./routes/analytics.routes'));
     }
 
@@ -48,3 +50,5 @@ class App {
 
 const application = new App();
 application.start();
+
+

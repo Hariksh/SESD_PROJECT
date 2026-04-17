@@ -43,6 +43,21 @@ class ProductSchema {
             }
         });
 
+        /**
+         * isAvailable(qty) — checks if sufficient stock exists for a given quantity.
+         * Defined per class diagram: Product +isAvailable(int qty)
+         */
+        schema.methods.isAvailable = function (qty) {
+            return this.stock >= qty;
+        };
+
+        /**
+         * isLowStock() — returns true if stock is at or below the lowStockThreshold.
+         */
+        schema.methods.isLowStock = function () {
+            return this.stock <= this.lowStockThreshold && this.stock > 0;
+        };
+
         return schema;
     }
 }

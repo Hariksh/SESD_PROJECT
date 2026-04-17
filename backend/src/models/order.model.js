@@ -59,6 +59,11 @@ class OrderSchema {
                 enum: ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
                 default: 'PENDING',
             },
+            deliveryLocation: {
+                address: { type: String },
+                city: { type: String },
+                postalCode: { type: String },
+            },
         }, {
             timestamps: true,
         });
@@ -73,6 +78,16 @@ class OrderSchema {
                 (sum, item) => sum + (item.quantity * item.unitPrice), 0
             );
             return this.totalAmount;
+        };
+
+        /**
+         * addLocation(location) — attaches delivery location metadata to the order.
+         * Defined per class diagram: Order +addLocation()
+         * @param {Object} location - e.g. { address, city, postalCode }
+         */
+        schema.methods.addLocation = function (location) {
+            this.deliveryLocation = location;
+            return this;
         };
 
         return schema;

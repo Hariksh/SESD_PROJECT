@@ -31,12 +31,20 @@ class InventoryService extends BaseService {
             throw new Error('Conflict: Product was updated by another process. Please retry.');
         }
 
-
         await StockLog.create({
             product: product._id,
             quantityChanged: quantity,
             changeType: quantity > 0 ? 'RESTOCK' : 'DEDUCT',
         });
+
+        // Low-stock threshold alert (idea.md: "Auto-alerts when stock dips below threshold")
+        if (product.isLowStock()) {
+            console.warn(
+                `[LOW STOCK ALERT] Product "${product.name}" (ID: ${product._id}) ` +
+                `has only ${product.stock} units left (threshold: ${product.lowStockThreshold}).`
+            );
+            product._lowStockAlert = true;
+        }
 
         return product;
     }

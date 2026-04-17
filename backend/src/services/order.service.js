@@ -8,7 +8,7 @@ class OrderService extends BaseService {
     constructor() {
         super(Order);
     }
-    async placeOrder(userId, items) {
+    async placeOrder(userId, items, location = null) {
         if (!items || items.length === 0) {
             throw new Error('Order must have at least one item');
         }
@@ -26,7 +26,8 @@ class OrderService extends BaseService {
                     throw new Error(`Product not found: ${item.productId}`);
                 }
 
-                if (product.stock < item.quantity) {
+                // Use model method isAvailable() as per class diagram
+                if (!product.isAvailable(item.quantity)) {
                     throw new Error(
                         `Insufficient stock for "${product.name}". Available: ${product.stock}, Requested: ${item.quantity}`
                     );
@@ -65,6 +66,12 @@ class OrderService extends BaseService {
                 items: orderItems,
             });
             order.calculateTotal();
+
+            // Use model method addLocation() as per class diagram
+            if (location) {
+                order.addLocation(location);
+            }
+
             await order.save({ session });
 
             for (const log of stockLogs) {

@@ -9,6 +9,7 @@ router.post('/', authorize('ADMIN', 'STAFF'), (req, res) => orderController.plac
 router.get('/', authorize('ADMIN', 'STAFF'), (req, res) => orderController.getOrders(req, res));
 router.get('/:id', authorize('ADMIN', 'STAFF'), (req, res) => orderController.getOrderById(req, res));
 
-router.patch('/:id/status', authorize('ADMIN'), (req, res) => orderController.updateOrderStatus(req, res));
+// Use-case diagram: Staff → UC5 (Update Order Status). Both ADMIN and STAFF can update status.
+router.patch('/:id/status', authorize('ADMIN', 'STAFF'), (req, res) => orderController.updateOrderStatus(req, res));
 
 module.exports = router;

@@ -4,7 +4,7 @@ const orderService = require('../services/order.service');
 class OrderController extends BaseController {
     async placeOrder(req, res) {
         try {
-            const order = await orderService.placeOrder(req.user._id, req.body.items);
+            const order = await orderService.placeOrder(req.user._id, req.body.items, req.body.deliveryLocation || null);
             return this.sendSuccess(res, order, 'Order placed successfully', 201);
         } catch (error) {
             if (error.message.includes('Conflict')) {
