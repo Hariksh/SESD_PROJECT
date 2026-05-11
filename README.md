@@ -2,7 +2,7 @@
 
 A full-stack, role-based Inventory and Order Management System built with Node.js / Express (backend) and React / Vite (frontend), backed by MongoDB.
 
-**Live Demo**: [https://sesd-project-beige.vercel.app/login](https://sesd-project-beige.vercel.app/login)
+**Live Demo**: [[https://sesd-project-beige.vercel.app/login](https://sesd-project-beige.vercel.app/login)](https://sesd-project-beige.vercel.app/login)
 
 ---
 
